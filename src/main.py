@@ -1,3 +1,4 @@
+from centuria_export import procesarReporte
 import os
 import logging
 # pyrefly: ignore [missing-import]
@@ -34,8 +35,13 @@ PASSWORD = os.getenv("TEST_PASSWORD")
 #SHEET_CONSULTA = os.getenv("SPREADSHEET_ID")
 
 #WORKSHEET_NAME = os.getenv("WORKSHEET_NAME")
+categorias = [
 
+]
 
+compradores = [
+
+]
 def run(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(
             headless=False,
@@ -82,7 +88,21 @@ def run(playwright: Playwright) -> None:
     page1.get_by_role("textbox", name="Fecha Inicial:").fill("01/11/2026") # LA FECHA INICIO Y FIN DEBEN SER VARIABLES AUTOCALCULABLES
     page1.get_by_role("textbox", name="Fecha Final:").fill("08/11/2026")   # LA FECHA INICIO Y FIN DEBEN SER VARIABLES AUTOCALCULABLES
 
-    
+    #NOTA: Cambiar con el estandar del otro bot que tengo (NO OLVIDAR)
+    with page1.expect_download() as download_info:
+        page1.get_by_role("button", name="Ver Resultado").click()
+        data_filtrada = procesarReporte(download_info.value.path(),categorias,compradores);
+        print(data_filtrada)
+
+    download = download_info.value
+
+    #print(download.path())
+
+
+    #download.save_as("data/reporte_oc.xlsx") #asumo es un xlsx
+
+
+
 
     page.wait_for_timeout(5000)
     return 1
